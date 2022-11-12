@@ -50,6 +50,21 @@ export const updateHandler = async (req, res) => {
   }
 };
 
+export const deleteHandler = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (email === undefined) {
+      throw new Error("Arguments Missing");
+    }
+    const user = await userModel.findOne({ email });
+    if (user === null) throw new Error("User Not Found");
+    await user.remove();
+    sendSuccessResponse(res, "Successfully Removed");
+  } catch (error) {
+    sendErrorResponse(res, error.message);
+  }
+};
+
 export const getAllUsers = async (req, res) => {
   try {
     const users = await userModel.find();
