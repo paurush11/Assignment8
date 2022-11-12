@@ -25,37 +25,26 @@ export const createUserHandler = async (req, res) => {
 
 export const updateHandler = async (req, res) => {
   try {
-    const { oldName, newName, password } = req.body;
+    const { oldEmail, name, password } = req.body;
     if (
-      oldName === undefined ||
-      newName === undefined ||
+      oldEmail === undefined ||
       password === undefined
     ) {
       throw new Error("Arguments Missing");
     }
-    const user = await userModel.findOne({ name: oldName });
+    const user = await userModel.findOne({ email: oldEmail });
     if (user === null) throw new Error("User Not Found");
-    user.name = newName;
-    if (ans === "Weak") throw new Error("Password is Weak");
-    const hashPassword = await encryptPassword(password);
-    user.password = hashPassword;
+
+    if (password !== undefined) {
+      const hashPassword = await encryptPassword(password);
+      user.password = hashPassword;
+    }
+    if (name !== undefined) {
+      user.full_name = name;
+    }
+
     await user.save();
     sendSuccessResponse(res, user);
-  } catch (error) {
-    sendErrorResponse(res, error.message);
-  }
-};
-
-export const deleteHandler = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (email === undefined) {
-      throw new Error("Arguments Missing");
-    }
-    const user = await userModel.findOne({ email });
-    if (user === null) throw new Error("User Not Found");
-    await user.remove();
-    sendSuccessResponse(res, "Successfully Removed");
   } catch (error) {
     sendErrorResponse(res, error.message);
   }
